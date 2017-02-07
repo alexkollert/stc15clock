@@ -87,13 +87,11 @@ void stc15_detect_display() {
   /* set P2 to push-pull, high */
   P2M0 = 0xFF;
   P2M1 = 0x00;
-  /* set P3 to input/output mode */
+  /* set P3 to input */
   P3M0 &= 0xC3;
-  P3M1 &= 0xC3;
+  P3M1 |= 0xC3;
   /* set P2 to high... */
   P2 = 0xFF;
-  /* set P3_2..5 to high... */
-  P3 |= 0x3C;
 
   /* if the current flows, we have a common cathode display */
   _common_anode = !(P3 & 0x3C );
