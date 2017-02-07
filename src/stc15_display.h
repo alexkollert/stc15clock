@@ -19,4 +19,10 @@ void stc15_show_time(uint8_t /* hours_high */,
 
 void stc15_show_byte(uint8_t /* value */);
 
+/*
+ * Detect if display connected to pins P2_0..7 / P3_2..5 is
+ * a common cathode or anode type.
+ */
+void stc15_detect_display();
+
 #endif  // __STC15_DISPLAY_H_

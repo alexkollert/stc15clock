@@ -82,6 +82,9 @@ void check_buttons() {
 
 void main() {
   uint8_t hours_high, hours_low, minutes_high, minutes_low, seconds_mark;
+
+  stc15_detect_display();
+
   reset_io();
 
   ds1302_init();

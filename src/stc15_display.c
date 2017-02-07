@@ -1,6 +1,9 @@
 #include "stc15_display.h"
 
-#include <8052.h>
+#include "stc15w404as.h"
+#include <stdbool.h>
+
+bool _common_anode = true;
 
 /*
 * State of 7 segment display
@@ -39,8 +42,13 @@ void _digit(uint8_t pos, uint8_t val, uint8_t dot) {
   uint8_t i;
 
   /* Reset bits P3_2..5 */
-  P3 &= 0xC3;
-  P3 |= 4 << (3 - pos);
+  if (!_common_anode) {
+    P3 &= 0xC3;
+    P3 |= 4 << (3 - pos);
+  } else {
+    P3 |= 0x3C;
+    P3 &= ~(4 << (3 - pos));
+  }
 
   /* Light up single segments to ensure even brightness */
   for(i = 0; i < 7; ++i) {
@@ -73,4 +81,20 @@ void stc15_show_byte(uint8_t value) {
   _digit(1, value % 100 / 10 , 0 );
   _digit(2, value / 100      , 0);
   _digit(3, 10               , 0);
+}
+
+void stc15_detect_display() {
+  /* set P2 to push-pull, high */
+  P2M0 = 0xFF;
+  P2M1 = 0x00;
+  /* set P3 to input/output mode */
+  P3M0 &= 0xC3;
+  P3M1 &= 0xC3;
+  /* set P2 to high... */
+  P2 = 0xFF;
+  /* set P3_2..5 to high... */
+  P3 |= 0x3C;
+
+  /* if the current flows, we have a common cathode display */
+  _common_anode = !(P3 & 0x3C );
 }
