@@ -20,6 +20,20 @@ uint8_t digits[11] = {
   0xFF  // NONE
 };
 
+uint8_t digits_upsd[11] = {
+  0xC0, // 0
+  0xCF, // 1
+  0xA4, // 2
+  0x86, // 3
+  0x8B, // 4
+  0x92, // 5
+  0x90, // 6
+  0xC7, // 7
+  0x80, // 8
+  0x82, // 9
+  0xFF  // NONE
+};
+
 /* Masks used to extract single segment value */
 uint8_t masks[7] = {
   0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF
@@ -59,7 +73,7 @@ void _char(uint8_t pos, char val, uint8_t dot) {
 
 void _display(uint8_t pos, uint8_t val, uint8_t dot) {
   /* Reset bits P3_2..5 */
-#ifdef COMMON_PIN_ACTIVE_STATE
+#if COMMON_PIN_ACTIVE_STATE
     P3 &= 0xC3;
     P3 |= 4 << (3 - pos);
 #else    
@@ -67,13 +81,10 @@ void _display(uint8_t pos, uint8_t val, uint8_t dot) {
     P3 &= ~(4 << (3 - pos));
 #endif
 
-  {
-    /* Light up single segments to ensure even brightness */
-    uint8_t i;
-    for(i = 0; i < 7; ++i) {
-      P2 = masks[i] | val;
-      _timer_delay();
-    }
+  /* Light up single segments to ensure even brightness */
+  for(uint8_t i = 0; i < 7; ++i) {
+    P2 = pos == 1 ? masks[i] | digits_upsd[val] : masks[i] | digits[val]; 
+    _timer_delay();
   }
 
   /* Append dot */
